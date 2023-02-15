@@ -1,0 +1,173 @@
+import React, { useState } from "react";
+import { Sdata } from "./data";
+import "./styles.css";
+
+const App = () => {
+  const [data, setData] = useState(Sdata);
+  const [refresh, setRefresh] = useState(false);
+  const [showFolderInput, setShowFolderInput] = useState(false);
+  const [showFileInput, setShowFileInput] = useState(false);
+  const [name, setName] = useState();
+  const [id, setId] = useState();
+
+  const handleChnage = (e) => {
+    setName(e.target.value);
+  };
+
+  const irrate = (newData) => {
+    newData?.forEach((menu, index, arr) => {
+      console.log(id);
+      if (menu?.id === id) {
+        menu?.subMenu?.push({
+          id: 10,
+          title: name,
+          isFolder: true,
+          subMenu: []
+        });
+      } else {
+        irrate(menu?.subMenu);
+      }
+    });
+  };
+
+  const irrateFile = (newData) => {
+    newData?.forEach((menu, index, arr) => {
+      if (menu?.id === id) {
+        menu?.subMenu?.push({
+          id: 12,
+          title: name,
+          isFolder: false
+        });
+      } else {
+        irrate(menu?.subMenu);
+      }
+    });
+  };
+
+  const addFolderHandler = () => {
+    irrate(data);
+  };
+  const addFileHandler = () => {
+    irrateFile(data);
+  };
+
+  const folderStruc = (data) => {
+    return (
+      <>
+        {data?.map((item, index, arr) => {
+          return (
+            <>
+              <div
+                className="mainContainer"
+                onClick={() => {
+                  item.show = !item.show;
+                  setRefresh(!refresh);
+                }}
+              >
+                {item?.isFolder ? `📂  ` : `📑 `}
+                {item?.title}
+                {item?.isFolder && (
+                  <div
+                    className="addContainer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <>
+                      <span
+                        onClick={() => {
+                          setShowFolderInput(!showFolderInput);
+                          setShowFileInput(false);
+                          setId(item?.id);
+                        }}
+                      >
+                        Add folder
+                      </span>
+                      <span
+                        onClick={() => {
+                          setShowFileInput(!showFileInput);
+                          setShowFolderInput(false);
+                          setId(item?.id);
+                        }}
+                        style={{ paddingLeft: "10px" }}
+                      >
+                        Add file
+                      </span>
+                    </>
+                  </div>
+                )}
+              </div>
+
+              {item?.show && item?.isFolder && (
+                <div className="innerContainer">
+                  {folderStruc(item?.subMenu)}
+                </div>
+              )}
+            </>
+          );
+        })}
+      </>
+    );
+  };
+
+  return (
+    <>
+      {folderStruc(data)}
+      <div className="inputContainer">
+        {showFolderInput && (
+          <>
+            📂{" "}
+            <input
+              type="text"
+              placeholder="Folder Name"
+              onChange={handleChnage}
+            />
+            <button onClick={addFolderHandler}>Add</button>
+          </>
+        )}
+        {showFileInput && (
+          <>
+            📑{" "}
+            <input
+              type="text"
+              placeholder="File Name"
+              onChange={handleChnage}
+            />
+            <button onClick={addFileHandler}>Add</button>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default App;
+
+
+
+
+/*Sdata FIle*/
+/*export const Sdata = [
+  {
+    id: 1,
+    title: "Public",
+    isFolder: true,
+    subMenu: [
+      { id: 2, title: "images", isFolder: true, show: false, subMenu: [] },
+      { id: 3, title: "index.html", isFolder: false, show: false, subMenu: [] }
+    ]
+  },
+  {
+    id: 4,
+    title: "Src",
+    isFolder: true,
+    subMenu: [
+      { id: 5, title: "app.js", isFolder: false, show: false, subMenu: [] },
+      { id: 6, title: "index.js", isFolder: false, show: false, subMenu: [] }
+    ]
+  },
+  {
+    id: 7,
+    title: "Package.json",
+    isFolder: false
+  }
+];
+*/
